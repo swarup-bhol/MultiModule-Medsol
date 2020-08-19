@@ -9,7 +9,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -31,7 +30,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	@Autowired
 	private JwtTokenUtil jwtTokenUtil;
-	
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
@@ -52,9 +50,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				logger.error("Authentication Failed. Username or Password not valid.");
 			}
 		} else {
-			logger.warn("couldn't find bearer string, will ignore the header");
+			logger.info("couldn't find bearer string, will ignore the header");
 		}
-		
+
 		if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
 			UserDetails userDetails = userDetailsService.loadUserByUsername(username);
@@ -69,24 +67,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		}
 		final List<String> allowedOrigins = Arrays.asList("http://localhost:4200");
 //		res.setHeader("Access-Control-Allow-Origin", "*");
-        res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
-	    res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Accept-Language, Host, Referer, Connection, User-Agent, authorization, sw-useragent, sw-version");
-         String origin = req.getHeader("Origin");
-         res.setHeader("Access-Control-Allow-Origin", allowedOrigins.contains(origin) ? origin : "");
-         res.setHeader("Vary", "Origin");
+		res.setHeader("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS");
+		res.setHeader("Access-Control-Allow-Headers",
+				"Origin, X-Requested-With, Content-Type, Accept, Accept-Encoding, Accept-Language, Host, Referer, Connection, User-Agent, authorization, sw-useragent, sw-version");
+		String origin = req.getHeader("Origin");
+		res.setHeader("Access-Control-Allow-Origin", allowedOrigins.contains(origin) ? origin : "");
+		res.setHeader("Vary", "Origin");
 
-         // Access-Control-Max-Age
-         res.setHeader("Access-Control-Max-Age", "3600");
+		// Access-Control-Max-Age
+		res.setHeader("Access-Control-Max-Age", "3600");
 
-         // Access-Control-Allow-Credentials
-         res.setHeader("Access-Control-Allow-Credentials", "true");
+		// Access-Control-Allow-Credentials
+		res.setHeader("Access-Control-Allow-Credentials", "true");
 
 		// Just REPLY OK if request method is OPTIONS for CORS (pre-flight)
-		if ( req.getMethod().equals("OPTIONS") ) {
-        res.setStatus(HttpServletResponse.SC_OK);
-        return;
+		if (req.getMethod().equals("OPTIONS")) {
+			res.setStatus(HttpServletResponse.SC_OK);
+			return;
 		}
-        
+
 		chain.doFilter(req, res);
 	}
 }
